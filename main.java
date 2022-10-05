@@ -1,4 +1,6 @@
 import java.util.Scanner;
+import java.io.*;
+import java.util.*;
 
 public class main {
 
@@ -32,7 +34,7 @@ public class main {
 	    System.out.println("Welcome to Arshad Mohammed and Wen Geng Lin's Calculator ");
 	    System.out.print("Input : ");
 	    String userMathematicalExpression = input.nextLine();
-
+        System.out.println(infixToPostfix(1+1));
 
 
 
@@ -149,8 +151,69 @@ public class main {
         return true;        
     }
 
-    
+    /**
+     *
+     * Takes the input string and converts it into postfix notation
+     *
+     * @param String: Input from the user at the start of the program
+     * @return String: The input in postfix notation
+     */
 
+    String infixToPostfix(String input){
+        Stack<String> stack = new Stack<>();
+        String postfix = "";
 
+        for(i=0; i<input.length(); i++){                            // for every item in the infix expression
+            char token = input.charAt(i);
+            if(isValidNumberCheck(token)){                          // if(token is a number)
+                postfix = postfix + input.charAt(i);                //  add token to postfix expression
+            }
+            else if(token = '('){                                   // else if(token == "(")
+                stack.push(token);                                  // push "(" to the stack
+            }
+            else if(isValidOperatorCheck(token)){                   // else if(token is an operator)
+                while(precedence(stack.peep)>=precedence(token)){   // while(top of stack is an operator with greater or equal precedence)
+                    String operator = (String) stack.pop;           // pop and add to postfix expression
+                    postfix = postfix + operator;
+                }
+            }
+            else if(token == ')'){                                  // else if(token == ")")
+                while(stack.peep != "("){                           // while(top of stack != "(")
+                    String character = (String) stack.pop;          // pop and add to postfix expression
+                    postfix = postfix + character;
+                }
+                String bracket = stack.pop;                         // pop "("
+            }
+        }
+        while(!stack.empty()){                                      // while(stack is not empty)
+            String character = (String) stack.pop;                  // pop remaining characters and add to postfix expression
+            postfix = postfix + character;
+        }
+        return postfix;
+    }
+
+    /**
+     *
+     * Takes an operator and return it's precedence as an int, the higher precedence, the higher the integer.
+     * Used in the infixToPostfix function
+     *
+     * @param char: Input operator
+     * @return int: An int signifying the precedence of the oeprator
+     */
+
+    int precedence(char operator){
+        if(operator=='+' || operator=='-'){
+            return 1;
+        }
+        else if(operator=='*' || operator=='/'){
+            return 2;
+        }
+        else if(operator=='^'){
+            return 3;
+        }
+        else{
+            return 0;
+        }
+    }
 
 }
