@@ -31,9 +31,10 @@ public class main {
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);  // Create a Scanner object
 	    System.out.println("Welcome to Arshad Mohammed and Wen Geng Lin's Calculator ");
-	    //System.out.print("Input : ");
-	    //String userMathematicalExpression = input.nextLine();
-        String result = infixToPostfix("1+13+17");
+	    System.out.print("Input : ");
+	    String userMathematicalExpression = input.nextLine();
+        String postfixExpression = infixToPostfix(userMathematicalExpression);
+        int result = evaluatePostfix(postfixExpression);
         System.out.println(result);
 
 
@@ -163,40 +164,40 @@ static boolean isValidNumberCheck(char input){
         Stack<String> stack = new Stack<>();
         String postfix = "";
 
-        for(int i=0; i<input.length(); i++){                                    // for every item in the infix expression
+        for(int i=0; i<input.length(); i++){                                            // for every item in the infix expression
             char token = input.charAt(i);
-            if(isValidNumberCheck(token)){                                      // if(token is a number)
-                postfix = postfix + input.charAt(i);                            //      add token to postfix expression
-                if(i+1<input.length() && !isValidNumberCheck(input.charAt(i+1))){ //      if(next character is an operand)
-                    postfix = postfix + " ";                                    //          add a space to separate the operators
+            if(isValidNumberCheck(token)){                                              // if(token is a number)
+                postfix = postfix + input.charAt(i);                                    //      add token to postfix expression
+                if(i+1<input.length() && !isValidNumberCheck(input.charAt(i+1))){       //      if(next character is an operand)
+                    postfix = postfix + " ";                                            //          add a space to separate the operators
                 }
             }
-            else if(token == '('){                                              // else if(token == "(")
-                stack.push("(");                                           //       push "(" to the stack
+            else if(token == '('){                                                      // else if(token == "(")
+                stack.push("(");                                                   //       push "(" to the stack
             }
-            else if(isValidOperatorCheck(token)){                               // else if(token is an operator)
+            else if(isValidOperatorCheck(token)){                                       // else if(token is an operator)
                 while(stack.size()>0 && (stack.peek().charAt(0)>=precedence(token))){   //      while(top of stack is an operator with greater or equal precedence)
-                    String operator = stack.pop();                              //          pop and add to postfix expression
+                    String operator = stack.pop();                                      //          pop and add to postfix expression
                     postfix = postfix + operator;
                     if(i+1<input.length()){
-                        postfix = postfix + " ";                                //  add a space after the operand unless it is the end of the string
+                        postfix = postfix + " ";                                        //  add a space after the operand unless it is the end of the string
                     }
                 }
                 stack.push(String.valueOf(token));
             }
-            else if(token == ')'){                                             // else if(token == ")")
-                while(stack.peek() != "("){                                    //       while(top of stack != "(")
-                    String character = stack.pop();                            //           pop and add to postfix expression
+            else if(token == ')'){                                                      // else if(token == ")")
+                while(stack.peek() != "("){                                             //       while(top of stack != "(")
+                    String character = stack.pop();                                     //           pop and add to postfix expression
                     postfix = postfix + character;
                     if(i+1<input.length()){
-                        postfix = postfix + " ";                               //  add a space after the operand unless it is the end of the string
+                        postfix = postfix + " ";                                        //  add a space after the operand unless it is the end of the string
                     }
                 }
-                String bracket = stack.pop();                                  //       pop "("
+                String bracket = stack.pop();                                           //       pop "("
             }
         }
-        while(!stack.empty()){                                                 // while(stack is not empty)
-            String character = stack.pop();                                    //       pop remaining characters and add to postfix expression
+        while(!stack.empty()){                                                          // while(stack is not empty)
+            String character = stack.pop();                                             //       pop remaining characters and add to postfix expression
             postfix = postfix + " " + character;
         }
         return postfix;
@@ -208,7 +209,7 @@ static boolean isValidNumberCheck(char input){
      * Used in the infixToPostfix function
      *
      * @param operator Input operator
-     * @return int An int signifying the precedence of the oeprator
+     * @return int An int signifying the precedence of the operator
      */
 
     static int precedence(char operator){
@@ -224,6 +225,57 @@ static boolean isValidNumberCheck(char input){
         else{
             return 0;
         }
+    }
+
+    /**
+     *
+     * Takes a string in postfix notation and evaluate it
+     *
+     * @param input Input string in postfix notation
+     * @return the answer to the sum
+     */
+
+    static int evaluatePostfix(String input){
+        String[] inputArray = input.split(" ");       // split the input string by spaces
+        Stack<Integer> stack = new Stack<Integer>();
+
+        for(int i=0; i< inputArray.length; i++){            // scan through the array of inputs
+            String token = inputArray[i];
+
+            if(isValidNumberCheck(token.charAt(0))){        // if token is an operand, push to stack
+                stack.push(Integer.parseInt(token));
+            }
+            else{                                           // else if token is an operator, pop two operands and perform the calculation
+                int number1 = stack.pop();
+                int number2 = stack.pop();
+
+                switch(token){
+                    case"+":
+                        int result = number2 + number1;
+                        stack.push(result);
+                        break;
+                    case"-":
+                        result = number2 - number1;
+                        stack.push(result);
+                        break;
+                    case"*":
+                        result = number2 * number1;
+                        stack.push(result);
+                        break;
+                    case"/":
+                        if(number1 == 0){                   // make sure to not divide by 0
+                            return -420;
+                        }
+                        else{
+                            result = number2 / number1;
+                            stack.push(result);
+                            break;
+                        }
+                }
+            }
+        }
+        int result = stack.pop();                           // the remaining number on the stack is the result
+        return result;
     }
 
 }
