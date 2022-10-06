@@ -33,7 +33,7 @@ public class main {
 	    System.out.println("Welcome to Arshad Mohammed and Wen Geng Lin's Calculator ");
 	    //System.out.print("Input : ");
 	    //String userMathematicalExpression = input.nextLine();
-        String result = infixToPostfix("1+13");
+        String result = infixToPostfix("1+13+17");
         System.out.println(result);
 
 
@@ -46,7 +46,7 @@ public class main {
      * output: boolean
      * 
      * Checks if the char is either a +, -, * or / and outputs false otherwise
-     * 
+     *
      */
 	}
 
@@ -156,7 +156,7 @@ static boolean isValidNumberCheck(char input){
      * Takes the input string and converts it into postfix notation
      *
      * @param input Input from the user at the start of the program
-     * @return String The input in postfix notation
+     * @return array of strings that contain the input in postfix notation with operators and operands separated by spaces
      */
 
     static String infixToPostfix(String input){
@@ -167,6 +167,9 @@ static boolean isValidNumberCheck(char input){
             char token = input.charAt(i);
             if(isValidNumberCheck(token)){                                      // if(token is a number)
                 postfix = postfix + input.charAt(i);                            //      add token to postfix expression
+                if(i+1<input.length() && !isValidNumberCheck(input.charAt(i+1))){ //      if(next character is an operand)
+                    postfix = postfix + " ";                                    //          add a space to separate the operators
+                }
             }
             else if(token == '('){                                              // else if(token == "(")
                 stack.push("(");                                           //       push "(" to the stack
@@ -175,6 +178,9 @@ static boolean isValidNumberCheck(char input){
                 while(stack.size()>0 && (stack.peek().charAt(0)>=precedence(token))){   //      while(top of stack is an operator with greater or equal precedence)
                     String operator = stack.pop();                              //          pop and add to postfix expression
                     postfix = postfix + operator;
+                    if(i+1<input.length()){
+                        postfix = postfix + " ";                                //  add a space after the operand unless it is the end of the string
+                    }
                 }
                 stack.push(String.valueOf(token));
             }
@@ -182,13 +188,16 @@ static boolean isValidNumberCheck(char input){
                 while(stack.peek() != "("){                                    //       while(top of stack != "(")
                     String character = stack.pop();                            //           pop and add to postfix expression
                     postfix = postfix + character;
+                    if(i+1<input.length()){
+                        postfix = postfix + " ";                               //  add a space after the operand unless it is the end of the string
+                    }
                 }
                 String bracket = stack.pop();                                  //       pop "("
             }
         }
         while(!stack.empty()){                                                 // while(stack is not empty)
             String character = stack.pop();                                    //       pop remaining characters and add to postfix expression
-            postfix = postfix + character;
+            postfix = postfix + " " + character;
         }
         return postfix;
     }
